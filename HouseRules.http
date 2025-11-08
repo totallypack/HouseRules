@@ -1,0 +1,6 @@
+@HouseRules_HostAddress = http://localhost:5193
+
+GET {{HouseRules_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
