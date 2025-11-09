@@ -1,8 +1,13 @@
 import { Route, Routes } from "react-router-dom";
-import Bikes from "./bikes/Bikes";
 import { AuthorizedRoute } from "./auth/AuthorizedRoute";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
+import Home from "./Home";
+import UserProfileList from "./userprofiles/UserProfileList";
+import UserProfileDetails from "./userprofiles/UserProfileDetails";
+import ChoresList from "./chores/ChoresList";
+import ChoreDetails from "./chores/ChoreDetails";
+import CreateChore from "./chores/CreateChore";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -12,7 +17,7 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           index
           element={
             <AuthorizedRoute loggedInUser={loggedInUser}>
-              <Bikes />
+              <Home />
             </AuthorizedRoute>
           }
         />
@@ -23,6 +28,50 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
         <Route
           path="register"
           element={<Register setLoggedInUser={setLoggedInUser} />}
+        />
+      </Route>
+      <Route path="userprofiles">
+        <Route
+          index
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser} roles={["Admin"]}>
+              <UserProfileList />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path=":id"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser} roles={["Admin"]}>
+              <UserProfileDetails />
+            </AuthorizedRoute>
+          }
+        />
+      </Route>
+      <Route path="chores">
+        <Route
+          index
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser}>
+              <ChoresList loggedInUser={loggedInUser} />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path=":id"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser} roles={["Admin"]}>
+              <ChoreDetails />
+            </AuthorizedRoute>
+          }
+        />
+        <Route
+          path="create"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser} roles={["Admin"]}>
+              <CreateChore />
+            </AuthorizedRoute>
+          }
         />
       </Route>
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
