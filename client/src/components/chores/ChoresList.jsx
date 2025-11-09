@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getChores, deleteChore } from "../../managers/choreManager";
+import { getChores, deleteChore, completeChore } from "../../managers/choreManager";
 import { Link } from "react-router-dom";
 import { Table, Button } from "reactstrap";
 
@@ -20,6 +20,12 @@ export default function ChoresList({ loggedInUser }) {
         getAllChores();
       });
     }
+  };
+
+  const handleComplete = (choreId) => {
+    completeChore(choreId, loggedInUser.id).then(() => {
+      getAllChores();
+    });
   };
 
   const isAdmin = loggedInUser?.roles?.includes("Admin");
@@ -50,6 +56,14 @@ export default function ChoresList({ loggedInUser }) {
               <td>{chore.difficulty}</td>
               <td>{chore.choreFrequencyDays}</td>
               <td>
+                <Button
+                  color="success"
+                  size="sm"
+                  onClick={() => handleComplete(chore.id)}
+                  className="me-2"
+                >
+                  Complete
+                </Button>
                 {isAdmin && (
                   <>
                     <Link to={`/chores/${chore.id}`} className="me-2">

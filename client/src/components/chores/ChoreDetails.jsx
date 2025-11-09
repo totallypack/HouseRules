@@ -1,14 +1,43 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getChoreById } from "../../managers/choreManager";
+import { getChoreById, assignChore, unassignChore } from "../../managers/choreManager";
+import { getUserProfiles } from "../../managers/userProfileManager";
+import { FormGroup, Input, Label } from "reactstrap";
 
 export default function ChoreDetails() {
   const { id } = useParams();
   const [chore, setChore] = useState(null);
+  const [userProfiles, setUserProfiles] = useState([]);
+
+  const loadChore = () => {
+    getChoreById(id).then(setChore);
+  };
 
   useEffect(() => {
-    getChoreById(id).then(setChore);
+    loadChore();
+    getUserProfiles().then(setUserProfiles);
   }, [id]);
+
+  const isUserAssigned = (userId) => {
+    return chore.choreAssignments?.some(
+      (assignment) => assignment.userProfileId === userId
+    );
+  };
+
+  const handleCheckboxChange = (e) => {
+    const userId = parseInt(e.target.value);
+    const isChecked = e.target.checked;
+
+    if (isChecked) {
+      assignChore(id, userId).then(() => {
+        loadChore();
+      });
+    } else {
+      unassignChore(id, userId).then(() => {
+        loadChore();
+      });
+    }
+  };
 
   if (!chore) {
     return <div>Loading...</div>;
@@ -36,18 +65,20 @@ export default function ChoreDetails() {
         </p>
       </div>
 
-      <h3>Current Assignees</h3>
-      {chore.choreAssignments && chore.choreAssignments.length > 0 ? (
-        <ul>
-          {chore.choreAssignments.map((assignment) => (
-            <li key={assignment.id}>
-              {assignment.userProfile.firstName} {assignment.userProfile.lastName}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No users assigned</p>
-      )}
+      <h3>Assign Users</h3>
+      {userProfiles.map((user) => (
+        <FormGroup check key={user.id}>
+          <Input
+            type="checkbox"
+            value={user.id}
+            checked={isUserAssigned(user.id)}
+            onChange={handleCheckboxChange}
+          />
+          <Label check>
+            {user.firstName} {user.lastName}
+          </Label>
+        </FormGroup>
+      ))}
 
       <h3>Most Recent Completion</h3>
       {mostRecentCompletion ? (
