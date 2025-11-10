@@ -10,17 +10,31 @@ export default function CreateChore() {
     difficulty: 1,
     choreFrequencyDays: 1,
   });
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createChore(chore).then(() => {
-      navigate("/chores");
+    createChore(chore).then((res) => {
+      if (res.errors) {
+        setErrors(res.errors);
+      } else {
+        navigate("/chores");
+      }
     });
   };
 
   return (
     <div className="container">
       <h2>Create New Chore</h2>
+      {Object.keys(errors).length > 0 && (
+        <div style={{ color: "red" }}>
+          {Object.keys(errors).map((key) => (
+            <p key={key}>
+              {key}: {errors[key].join(",")}
+            </p>
+          ))}
+        </div>
+      )}
       <Form onSubmit={handleSubmit}>
         <FormGroup>
           <Label for="name">Name</Label>
@@ -52,12 +66,21 @@ export default function CreateChore() {
             type="number"
             id="frequency"
             min="1"
+            max="14"
+            list="frequency-suggestions"
             value={chore.choreFrequencyDays}
             onChange={(e) =>
               setChore({ ...chore, choreFrequencyDays: parseInt(e.target.value) })
             }
             required
           />
+          <datalist id="frequency-suggestions">
+            <option value="1" />
+            <option value="3" />
+            <option value="7" />
+            <option value="10" />
+            <option value="14" />
+          </datalist>
         </FormGroup>
         <Button color="primary" type="submit">
           Create Chore

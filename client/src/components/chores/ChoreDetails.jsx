@@ -1,16 +1,29 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getChoreById, assignChore, unassignChore } from "../../managers/choreManager";
+import { useParams, useNavigate } from "react-router-dom";
+import { getChoreById, assignChore, unassignChore, updateChore } from "../../managers/choreManager";
 import { getUserProfiles } from "../../managers/userProfileManager";
-import { FormGroup, Input, Label } from "reactstrap";
+import { FormGroup, Input, Label, Form, Button } from "reactstrap";
 
 export default function ChoreDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [chore, setChore] = useState(null);
   const [userProfiles, setUserProfiles] = useState([]);
+  const [editedChore, setEditedChore] = useState({
+    name: "",
+    difficulty: 1,
+    choreFrequencyDays: 1,
+  });
 
   const loadChore = () => {
-    getChoreById(id).then(setChore);
+    getChoreById(id).then((choreData) => {
+      setChore(choreData);
+      setEditedChore({
+        name: choreData.name,
+        difficulty: choreData.difficulty,
+        choreFrequencyDays: choreData.choreFrequencyDays,
+      });
+    });
   };
 
   useEffect(() => {
@@ -39,6 +52,13 @@ export default function ChoreDetails() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    updateChore(id, editedChore).then(() => {
+      navigate("/chores");
+    });
+  };
+
   if (!chore) {
     return <div>Loading...</div>;
   }
@@ -52,20 +72,67 @@ export default function ChoreDetails() {
 
   return (
     <div className="container">
-      <h2>Chore Details</h2>
-      <div>
-        <p>
-          <strong>Name:</strong> {chore.name}
-        </p>
-        <p>
-          <strong>Difficulty:</strong> {chore.difficulty}
-        </p>
-        <p>
-          <strong>Frequency (Days):</strong> {chore.choreFrequencyDays}
-        </p>
-      </div>
+      <h2>Update Chore</h2>
+      <Form onSubmit={handleSubmit}>
+        <FormGroup>
+          <Label for="name">Name</Label>
+          <Input
+            type="text"
+            id="name"
+            value={editedChore.name}
+            onChange={(e) =>
+              setEditedChore({ ...editedChore, name: e.target.value })
+            }
+            required
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label for="difficulty">Difficulty (1-5)</Label>
+          <Input
+            type="number"
+            id="difficulty"
+            min="1"
+            max="5"
+            value={editedChore.difficulty}
+            onChange={(e) =>
+              setEditedChore({
+                ...editedChore,
+                difficulty: parseInt(e.target.value),
+              })
+            }
+            required
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label for="frequency">Frequency (Days)</Label>
+          <Input
+            type="number"
+            id="frequency"
+            min="1"
+            max="14"
+            value={editedChore.choreFrequencyDays}
+            onChange={(e) =>
+              setEditedChore({
+                ...editedChore,
+                choreFrequencyDays: parseInt(e.target.value),
+              })
+            }
+            required
+          />
+        </FormGroup>
+        <Button color="primary" type="submit">
+          Update Chore
+        </Button>
+        <Button
+          color="secondary"
+          className="ms-2"
+          onClick={() => navigate("/chores")}
+        >
+          Cancel
+        </Button>
+      </Form>
 
-      <h3>Assign Users</h3>
+      <h3 className="mt-4">Assign Users</h3>
       {userProfiles.map((user) => (
         <FormGroup check key={user.id}>
           <Input
@@ -80,7 +147,7 @@ export default function ChoreDetails() {
         </FormGroup>
       ))}
 
-      <h3>Most Recent Completion</h3>
+      <h3 className="mt-4">Most Recent Completion</h3>
       {mostRecentCompletion ? (
         <p>
           Completed on: {new Date(mostRecentCompletion.completedOn).toLocaleDateString()}

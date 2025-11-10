@@ -24,12 +24,27 @@ public class ChoreController : ControllerBase
     {
         return Ok(_dbContext
             .Chores
+            .Include(c => c.ChoreCompletions)
+            .Include(c => c.ChoreAssignments)
             .Select(c => new ChoreDTO
             {
                 Id = c.Id,
                 Name = c.Name,
                 Difficulty = c.Difficulty,
-                ChoreFrequencyDays = c.ChoreFrequencyDays
+                ChoreFrequencyDays = c.ChoreFrequencyDays,
+                ChoreCompletions = c.ChoreCompletions.Select(cc => new ChoreCompletionDTO
+                {
+                    Id = cc.Id,
+                    UserProfileId = cc.UserProfileId,
+                    ChoreId = cc.ChoreId,
+                    CompletedOn = cc.CompletedOn
+                }).ToList(),
+                ChoreAssignments = c.ChoreAssignments.Select(ca => new ChoreAssignmentDTO
+                {
+                    Id = ca.Id,
+                    UserProfileId = ca.UserProfileId,
+                    ChoreId = ca.ChoreId
+                }).ToList()
             })
             .ToList());
     }

@@ -52,7 +52,9 @@ export default function ChoresList({ loggedInUser }) {
         <tbody>
           {chores.map((chore) => (
             <tr key={chore.id}>
-              <td>{chore.name}</td>
+              <td style={{ color: chore.isOverdue ? "red" : "inherit" }}>
+                {chore.name}
+              </td>
               <td>{chore.difficulty}</td>
               <td>{chore.choreFrequencyDays}</td>
               <td>
