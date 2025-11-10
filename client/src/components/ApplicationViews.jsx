@@ -8,6 +8,7 @@ import UserProfileDetails from "./userprofiles/UserProfileDetails";
 import ChoresList from "./chores/ChoresList";
 import ChoreDetails from "./chores/ChoreDetails";
 import CreateChore from "./chores/CreateChore";
+import MyChores from "./chores/MyChores";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -74,6 +75,14 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           }
         />
       </Route>
+      <Route
+        path="mychores"
+        element={
+          <AuthorizedRoute loggedInUser={loggedInUser}>
+            <MyChores loggedInUser={loggedInUser} />
+          </AuthorizedRoute>
+        }
+      />
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
     </Routes>
   );

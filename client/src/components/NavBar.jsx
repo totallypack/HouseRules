@@ -33,6 +33,11 @@ return (
                     Chores
                 </NavLink>
                 </NavItem>
+                <NavItem>
+                <NavLink tag={RRNavLink} to="/mychores">
+                    My Chores
+                </NavLink>
+                </NavItem>
                 {loggedInUser.roles?.includes("Admin") && (
                 <NavItem>
                     <NavLink tag={RRNavLink} to="/userprofiles">
